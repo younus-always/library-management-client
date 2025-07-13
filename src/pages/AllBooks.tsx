@@ -1,27 +1,19 @@
+import AddBookModal from "@/components/books/AddBookModal";
 import TableView from "@/components/books/TableView";
-import { Button } from "@/components/ui/button";
 import { useTitle } from "@/hook/useTitle";
 import { useGetBooksQuery } from "@/redux/api/baseApi";
 
 const AllBooks = () => {
   useTitle("All Books");
-  const { data, isError, isLoading, isSuccess } = useGetBooksQuery(undefined, {
-    pollingInterval: 30000,
-    refetchOnMountOrArgChange: true,
-    refetchOnReconnect: true,
-    refetchOnFocus: true,
-  });
-
-  console.log(isError, isLoading, isSuccess, data);
-  if (isLoading) return;
+  const { data } = useGetBooksQuery(undefined);
 
   return (
     <section className="max-w-7xl mx-auto px-4 xl:px-0 py-12">
-      <div className="flex items-center justify-between mb-5">
-        <h3></h3>
-        <Button >Add Book</Button>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-3xl font-semibold">Total Books Data: {data?.data?.length || 0}</h3>
+        <AddBookModal/>
       </div>
-      <TableView data={data.data} />
+      <TableView />
     </section>
   );
 };

@@ -7,8 +7,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import BookRow from "./BookRow";
+import { useGetBooksQuery } from "@/redux/api/baseApi";
+import type { Book } from "@/types";
 
-const TableView = ({ data }) => {
+const TableView = () => {
+  const { data, isError, isLoading } = useGetBooksQuery(undefined, {
+    pollingInterval: 30000,
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+    refetchOnFocus: true,
+  });
+
+  if (isError) return <p className="text-xl sm:text-3xl font-bold text-center py-12">Oh no, there was an error! Please try again.</p>;
+  if (isLoading) return <p>Loading........</p>;
+
   return (
     <div>
       <Table className="overflow-x-auto">
@@ -25,8 +37,8 @@ const TableView = ({ data }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((book) => (
-            <BookRow key={book._id} book={book} />
+          {data?.data?.map((book: Book, idx: number) => (
+            <BookRow key={idx} book={book} />
           ))}
         </TableBody>
       </Table>

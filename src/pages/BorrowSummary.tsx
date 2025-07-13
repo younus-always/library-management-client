@@ -12,14 +12,16 @@ import {
 
 const BorrowSummary = () => {
   useTitle("Borrow Summary");
-  const { data, isError, isLoading } = useGetBorrowsQuery(undefined);
+  const { data, isLoading } = useGetBorrowsQuery(undefined);
   if (isLoading) return <p>Loading......</p>;
   console.log(data.data);
 
-  const borrowQuantity = data.data.map((borrow) => borrow.totalQuantity);
+  const borrowQuantity = data.data.map(
+    (borrow: { totalQuantity: number }) => borrow.totalQuantity
+  );
 
-  const abc = data.data.map((book) => book.map((b) => b));
-  console.log(abc);
+  // const abc = data.data.map((book) => book.map((b) => b));
+  // console.log(abc);
 
   return (
     <section className="max-w-7xl mx-auto px-4 xl:px-0 py-12">
@@ -33,14 +35,14 @@ const BorrowSummary = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {/* <TableRow>
-            {data.data.map((book) =>
-              book.book.map((b) => <TableCell>{b}</TableCell>)
+          <TableRow>
+            {data?.data?.map((book: { book: unknown[]; }) =>
+              book.book.map((b) => <TableCell>{JSON.stringify(b)}</TableCell>)
             )}
-            {borrowQuantity.map((quantity) => (
+            {borrowQuantity.map((quantity:number) => (
               <TableCell>{quantity}</TableCell>
-            ))} */}
-          {/* </TableRow> */}
+            ))}
+          </TableRow>
         </TableBody>
       </Table>
     </section>
