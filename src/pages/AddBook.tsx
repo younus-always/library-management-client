@@ -1,5 +1,13 @@
+import { useTitle } from "@/hook/useTitle";
+
+
 const AddBook = () => {
-  return <div></div>;
+  useTitle("Add Book")
+  return (
+    <div>
+     
+    </div>
+  );
 };
 
 export default AddBook;
