@@ -10,3 +10,8 @@ export type Book = {
       createdAt: string,
       updatedAt: string
 }
+
+export type BorrowBook = {
+      book: { title: string; isbn: string }[];
+      totalQuantity: number;
+}

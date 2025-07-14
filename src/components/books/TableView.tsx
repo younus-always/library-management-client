@@ -9,17 +9,30 @@ import {
 import BookRow from "./BookRow";
 import { useGetBooksQuery } from "@/redux/api/baseApi";
 import type { Book } from "@/types";
+import ErrorMessage from "../ErrorMessage";
+import LoadingSpinner from "../LoadingSpinner";
+import { useState } from "react";
 
 const TableView = () => {
-  const { data, isError, isLoading } = useGetBooksQuery(undefined, {
-    pollingInterval: 30000,
-    refetchOnMountOrArgChange: true,
-    refetchOnReconnect: true,
-    refetchOnFocus: true,
-  });
+  const [page, setPage] = useState(1);
+  const limit = 10;
+  // Calculate skip dynamically:
+  const skip = (page - 1) * limit;
 
-  if (isError) return <p className="text-xl sm:text-3xl font-bold text-center py-12">Oh no, there was an error! Please try again.</p>;
-  if (isLoading) return <p>Loading........</p>;
+  const { data, isError, isLoading } = useGetBooksQuery(
+    { skip, limit },
+    {
+      pollingInterval: 30000,
+      refetchOnMountOrArgChange: true,
+      refetchOnReconnect: true,
+      refetchOnFocus: true,
+    }
+  );
+
+  console.log(data);
+
+  if (isError) return <ErrorMessage message="Failed to fetch books." />;
+  if (isLoading) return <LoadingSpinner />;
 
   return (
     <div>
@@ -42,6 +55,24 @@ const TableView = () => {
           ))}
         </TableBody>
       </Table>
+      {/* pagination */}
+      <div className="flex justify-center items-center gap-2 mt-4">
+        <button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          className={`px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-slate-700 cursor-pointer font-semibold ${page ===1 && "cursor-not-allowed"}`}
+          disabled={page === 1}
+        >
+          Prev
+        </button>
+        <span className="text-sm font-medium">Page {page}</span>
+        <button
+          onClick={() => setPage((prev) => prev + 1)}
+          className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-slate-700 cursor-pointer font-semibold"
+          disabled={data?.data?.length < limit}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

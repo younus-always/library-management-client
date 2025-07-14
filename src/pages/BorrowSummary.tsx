@@ -9,22 +9,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import type { BorrowBook } from "@/types";
+import ErrorMessage from "@/components/ErrorMessage";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const BorrowSummary = () => {
   useTitle("Borrow Summary");
-  const { data, isLoading } = useGetBorrowsQuery(undefined);
-  if (isLoading) return <p>Loading......</p>;
-  console.log(data.data);
+  const { data, isError, isLoading } = useGetBorrowsQuery(undefined, {
+    pollingInterval: 30000,
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+  });
 
-  const borrowQuantity = data.data.map(
-    (borrow: { totalQuantity: number }) => borrow.totalQuantity
-  );
-
-  // const abc = data.data.map((book) => book.map((b) => b));
-  // console.log(abc);
+  if (isError) return <ErrorMessage message="Failed to fetch borrow books." />;
+  if (isLoading) return <LoadingSpinner />;
 
   return (
-    <section className="max-w-7xl mx-auto px-4 xl:px-0 py-12">
+    <section className="max-w-7xl mx-auto px-4 2xl:px-0 py-12">
       <Table className="overflow-x-auto">
         <TableCaption>A list of borrow book.</TableCaption>
         <TableHeader>
@@ -35,14 +36,13 @@ const BorrowSummary = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            {data?.data?.map((book: { book: unknown[]; }) =>
-              book.book.map((b) => <TableCell>{JSON.stringify(b)}</TableCell>)
-            )}
-            {borrowQuantity.map((quantity:number) => (
-              <TableCell>{quantity}</TableCell>
-            ))}
-          </TableRow>
+          {data?.data?.map((item: BorrowBook, idx: number) => (
+            <TableRow key={idx}>
+              <TableCell>{item?.book[0]?.title}</TableCell>
+              <TableCell>{item?.book[0]?.isbn}</TableCell>
+              <TableCell>{item?.totalQuantity}</TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </section>

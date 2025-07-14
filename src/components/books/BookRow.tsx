@@ -1,7 +1,6 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import type { Book } from "@/types";
-import { FaBook } from "react-icons/fa6";
-import { MdDelete, MdModeEdit } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import {
   Tooltip,
   TooltipContent,
@@ -9,6 +8,9 @@ import {
 } from "@/components/ui/tooltip";
 import { useDeleteBookMutation } from "@/redux/api/baseApi";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
+import UpdateBookModal from "./UpdateBookModal";
+import AddBorrowModal from "../borrow/AddBorrowModal";
 
 const BookRow = ({ book }: { book: Book }) => {
   const [deleteBook] = useDeleteBookMutation();
@@ -27,7 +29,7 @@ const BookRow = ({ book }: { book: Book }) => {
   } = book || {};
 
   // book delete function
-  const handleDelete = async (id: string) => {
+  const handleDeleteModal = async (id: string) => {
     toast.custom((t) => (
       <div className="bg-slate-900 p-4 rounded-lg shadow text-slate-100">
         <p>Are you sure you want to delete this book?</p>
@@ -39,9 +41,10 @@ const BookRow = ({ book }: { book: Book }) => {
             Cancel
           </button>
           <button
-            onClick={() => {
+            onClick={async () => {
               // Perform delete here
-              deleteBook(id);
+              const res = await deleteBook(id).unwrap();
+               toast.success(`${res.message}`);
               toast.dismiss(t); // Close the toast
             }}
             className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer"
@@ -51,11 +54,6 @@ const BookRow = ({ book }: { book: Book }) => {
         </div>
       </div>
     ));
-  };
-
-  // book update function
-  const handleUpdate = (id) => {
-    console.log(id);
   };
 
   return (
@@ -70,47 +68,25 @@ const BookRow = ({ book }: { book: Book }) => {
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
+          {/* delete modal */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
-                onClick={() => handleDelete(_id)}
+              <Button
+                onClick={() => handleDeleteModal(_id)}
                 type="button"
-                className="p-1 rounded-full cursor-pointer text-red-500"
+                className="w-7 h-7 rounded-full hover:bg-accent-foreground bg-accent cursor-pointer text-red-500"
               >
-                <MdDelete size={20} />
-              </button>
+                <MdDelete />
+              </Button>
             </TooltipTrigger>
             <TooltipContent>
               <span>Delete Book</span>
             </TooltipContent>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => handleUpdate(_id)}
-                type="button"
-                className="p-2 rounded-full cursor-pointer text-orange-400"
-              >
-                <MdModeEdit size={20} />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <span>Update Book</span>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                className="p-2 rounded-full cursor-pointer text-green-500"
-              >
-                <FaBook size={20} />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <span>Borrow Book</span>
-            </TooltipContent>
-          </Tooltip>
+          {/* update modal */}
+          <UpdateBookModal book={book} />
+          {/* borrow modal */}
+          <AddBorrowModal book={book} />
         </div>
       </TableCell>
     </TableRow>

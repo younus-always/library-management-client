@@ -28,12 +28,12 @@ const router = createBrowserRouter([
         path: "borrow-summary",
         Component: BorrowSummary,
       },
-      {
-        path: "*",
-        Component: NotFound,
-      },
     ],
   },
+  {
+    path: "*",
+    element: <NotFound />,
+  }
 ]);
 
 export default router;

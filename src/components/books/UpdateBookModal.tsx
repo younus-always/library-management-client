@@ -1,4 +1,13 @@
-import { useTitle } from "@/hook/useTitle";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -14,31 +23,58 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form";
+import {
+  useForm,
+  type FieldValues,
+  type SubmitHandler,
+} from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useAddBookMutation } from "@/redux/api/baseApi";
+import { useEffect, useState } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { MdModeEdit } from "react-icons/md";
+import type { Book } from "@/types";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useUpdateBookMutation } from "@/redux/api/baseApi";
 
-const AddBook = () => {
-  useTitle("Add Book");
-  const form = useForm();
-  const [addBook] = useAddBookMutation();
-  const navigate = useNavigate();
-  const onSumit: SubmitHandler<FieldValues> = async (data) => {
+const UpdateBookModal = ({ book }: { book: Book }) => {
+  const [updateBook] = useUpdateBookMutation();
+  const [open, setOpen] = useState(false);
+  const { _id, title, author, copies, isbn, genre, description } = book || {};
+  const form = useForm({
+    defaultValues: {
+      title,
+      author,
+      copies,
+      isbn,
+      genre,
+      description,
+    },
+  });
+
+  // When modal opens, reset form with current book data
+  useEffect(() => {
+    if (open) {
+      form.reset({ ...book });
+    }
+  }, [book, form, open]);
+
+  // update submit handler
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       const { copies } = data;
-      if (copies < 1)
+      if (Number(copies) < 1)
         return toast.warning("Book copies must be a valid number!");
+      
       const bookData = {
         ...data,
         available: true,
       };
-      const res = await addBook(bookData).unwrap();
+      const res = await updateBook({ id: _id, data: bookData }).unwrap();
       toast.success(`${res.message}`);
+
       form.reset();
-      navigate("/all-books");
+      setOpen(false);
     } catch (err) {
       if (err && typeof err === "object" && "status" in err) {
         toast.error(`Error ${err.status}`);
@@ -50,27 +86,39 @@ const AddBook = () => {
   };
 
   return (
-    <section className="max-w-4xl mx-auto py-12">
-      <h3 className="text-3xl font-semibold text-center mb-4">Add New Book</h3>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSumit)}
-          className="space-y-3 rounded-xl py-6 px-5 shadow-xl"
-        >
-          <div className="space-y-3 sm:space-y-0 sm:flex items-center gap-3">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={() => setOpen(true)}
+              className="w-7 h-7 rounded-full hover:bg-accent-foreground bg-accent cursor-pointer text-orange-400"
+            >
+              <MdModeEdit />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <span>Update Book</span>
+          </TooltipContent>
+        </Tooltip>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogDescription className="sr-only">
+          Fill up this form to update book data
+        </DialogDescription>
+        <DialogHeader className="mb-2">
+          <DialogTitle>Update "{title}" Book</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel className="pl-2">Title</FormLabel>
+                  <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="book title"
-                      {...field}
-                      value={field.value || ""}
-                      required
-                    />
+                    <Input placeholder="book title" {...field} required />
                   </FormControl>
                 </FormItem>
               )}
@@ -80,32 +128,24 @@ const AddBook = () => {
               name="author"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel className="pl-2">Author</FormLabel>
+                  <FormLabel>Author</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="book author"
-                      {...field}
-                      value={field.value || ""}
-                      required
-                    />
+                    <Input placeholder="book author" {...field} required />
                   </FormControl>
                 </FormItem>
               )}
             />
-          </div>
-          <div className="space-y-3 sm:space-y-0 sm:flex items-center gap-3">
             <FormField
               control={form.control}
               name="copies"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel className="pl-2">Copies</FormLabel>
+                  <FormLabel>Copies</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       placeholder="book copies"
                       {...field}
-                      value={field.value || 1}
                       required
                     />
                   </FormControl>
@@ -117,31 +157,21 @@ const AddBook = () => {
               name="isbn"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel className="pl-2">ISBN</FormLabel>
+                  <FormLabel>ISBN</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="book isbn"
-                      {...field}
-                      value={field.value || ""}
-                      required
-                    />
+                    <Input placeholder="book isbn" {...field} required />
                   </FormControl>
                 </FormItem>
               )}
             />
-          </div>
-          <div className="space-y-3 sm:space-y-0 sm:flex items-center gap-3">
+            {/* select field */}
             <FormField
               control={form.control}
               name="genre"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel className="pl-2">Genre</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    required
-                  >
+                  <FormLabel>Genre</FormLabel>
+                  <Select onValueChange={field.onChange} {...field} required>
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select Genre" />
@@ -159,31 +189,38 @@ const AddBook = () => {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel className="pl-2">Description</FormLabel>
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="book description..."
+                      placeholder="book description... "
                       {...field}
-                      value={field.value || ""}
                       required
                     />
                   </FormControl>
                 </FormItem>
               )}
             />
-          </div>
-          <Button type="submit" className="w-full cursor-pointer mt-3 font-semibold">
-            Add Book
-          </Button>
-        </form>
-      </Form>
-    </section>
+            <DialogFooter className="mt-5">
+              <DialogClose asChild>
+                <Button variant="outline" className="cursor-pointer">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="submit" className="cursor-pointer">
+                Update
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export default AddBook;
+export default UpdateBookModal;
