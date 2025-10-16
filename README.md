@@ -2,8 +2,8 @@
 
 A minimal **Library Management System frontend** built with **React**, **Redux Toolkit Query**, **TypeScript**, and **Tailwind CSS**. This application allows users to view, manage, and borrow books from a RESTful API—demonstrating state management and clean UI architecture.
 
-> 🔗 **Live App:** [library-management-client-app.vercel.app](https://library-management-client-app.vercel.app/)  
-> 🛠️ **Backend API Repo:** [Library-management-api-with-express-typescript-mongoose](https://github.com/younus-always/Library-management-api-with-express-typescript-mongoose)
+> 🔗 **Live App:** [Librico - Library-Management](https://library-management-client-app.vercel.app/)  
+> 🛠️ **Backend API Repo:** [Librico - Library-Management-APIs](https://github.com/younus-always/Library-management-api-with-express-typescript-mongoose)
 
 ---
 
@@ -21,7 +21,7 @@ A minimal **Library Management System frontend** built with **React**, **Redux T
 
 ## ✨ Features
 
-- 📚 View all books from API
+- 📚 View all books from the API
 - ➕ Create, 📝 Update, ❌ Delete books
 - 📖 Borrow books (with simple borrow tracking)
 - 🔄 Optimistic UI updates via RTK Query
@@ -50,7 +50,7 @@ npm install
 Create a .env file in the client/ directory:
 
 ```bash
-VITE_API_URL=https://library-management-backend-api.vercel.app/api
+VITE_API_URL=https://library-management-backend-api.vercel.app
 ```
 
 Replace with your actual backend API base URL.
@@ -72,12 +72,12 @@ Backend Repo: Library-management-api-with-express-typescript-mongoose
 
 | Method   | Endpoint     | Description        |
 | -------- | ------------ | ------------------ |
-| `GET`    | `/books`     | Get all books      |
-| `POST`   | `/books`     | Create new book    |
-| `PUT`    | `/books/:id` | Update a book      |
-| `DELETE` | `/books/:id` | Delete a book      |
-| `POST`   | `/borrow`    | Borrow a book      |
-| `GET`    | `/borrow`    | Get borrow summary |
+| `GET`    | `api/books`     | Get all books      |
+| `POST`   | `api/books`     | Create new book    |
+| `PUT`    | `api/books/:id` | Update a book      |
+| `DELETE` | `api/books/:id` | Delete a book      |
+| `POST`   | `api/borrow`    | Borrow a book      |
+| `GET`    | `api/borrow`    | Get borrow summary |
 
 ## 🧪 Scripts
 
@@ -88,13 +88,13 @@ Backend Repo: Library-management-api-with-express-typescript-mongoose
 | `npm run preview` | Preview built app locally    |
 | `npm run lint`    | Run ESLint for code linting  |
 
-## 🚀 Deployment
-
 This project is deployed on Vercel.
 
-### 🟢 Live Site
+## 🟢 Live Site
 
-https://library-management-client-app.vercel.app
+**[Librico - Library Management System](https://library-management-client-app.vercel.app)**
+
+## 🚀 Deployment
 
 To deploy your own version:
 
@@ -105,12 +105,10 @@ vercel --prod
 
 Make sure your .env file is properly configured before deploying.
 
+## ✍️ Author
+
+Librico - Built with ❤️ by Md. Younus Islam
+
 ## 📄 License
 
 This project is open-source and available under the MIT License.
-
-## ✍️ Author
-
-**Younus**
-
-- [GitHub](https://github.com/younus-always)
